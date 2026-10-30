@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="theme-color" content="#f6f5ee">
+	<title>Little Life Log</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			color-scheme: light;
+			--paper: #f6f5ee;
+			--ink: #202a23;
+			--muted: #747b70;
+			--line: #dedfd4;
+			--green: #355d43;
+			--lime: #d7ed9b;
+			--coral: #e47d61;
+			--white: #fffefa;
+		}
+
+		* { box-sizing: border-box; }
+		body { margin: 0; background: var(--paper); color: var(--ink); font-family: "DM Sans", sans-serif; }
+		button, input, textarea { font: inherit; }
+
+		.page { width: min(1120px, calc(100% - 48px)); margin: 0 auto; padding: 28px 0 64px; }
+		.topbar { display: flex; align-items: center; justify-content: space-between; padding-bottom: 22px; border-bottom: 1px solid var(--line); }
+		.brand { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; letter-spacing: 0.02em; }
+		.brand-mark { display: grid; width: 30px; aspect-ratio: 1; place-items: center; border-radius: 50%; background: var(--lime); color: var(--green); font-size: 17px; }
+		.date-label, .eyebrow { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+		.intro { display: grid; grid-template-columns: 1.05fr 0.95fr; align-items: center; gap: 56px; padding: 42px 0 48px; }
+		h1, h2, p { margin-top: 0; }
+		h1, h2 { font-family: "Fraunces", Georgia, serif; font-weight: 500; letter-spacing: 0; }
+		h1 { max-width: 520px; margin: 14px 0 16px; font-size: clamp(42px, 6vw, 70px); line-height: 0.98; }
+		h1 span { color: var(--green); }
+		.intro-copy { max-width: 420px; margin-bottom: 24px; color: var(--muted); font-size: 15px; line-height: 1.7; }
+		.count-line { display: inline-flex; align-items: center; gap: 9px; color: var(--green); font-size: 12px; font-weight: 700; }
+		.count-dot { width: 8px; aspect-ratio: 1; border-radius: 50%; background: var(--coral); }
+		.cover { position: relative; min-height: 300px; overflow: hidden; border-radius: 5px; background: #d6dfc7; }
+		.cover img { position: absolute; width: 100%; height: 100%; object-fit: cover; inset: 0; }
+		.cover-note { position: absolute; right: 16px; bottom: 16px; padding: 10px 13px; background: var(--white); color: var(--ink); font-size: 11px; font-weight: 600; transform: rotate(-2deg); }
+
+		.content { display: grid; grid-template-columns: minmax(0, 1fr) 340px; align-items: start; gap: 64px; border-top: 1px solid var(--line); padding-top: 30px; }
+		.section-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 8px; }
+		h2 { margin-bottom: 0; font-size: 29px; }
+		.entries { display: grid; }
+		.entry { display: grid; grid-template-columns: 84px 1fr auto; gap: 16px; align-items: start; padding: 21px 0; border-bottom: 1px solid var(--line); animation: appear 280ms ease-out both; }
+		.entry-date { padding-top: 3px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+		.entry-mood { display: inline-flex; align-items: center; gap: 7px; margin-bottom: 8px; color: var(--green); font-size: 11px; font-weight: 700; }
+		.entry-mood::before { width: 7px; aspect-ratio: 1; border-radius: 50%; background: var(--coral); content: ""; }
+		.entry p { max-width: 500px; margin-bottom: 0; font-size: 14px; line-height: 1.65; overflow-wrap: anywhere; }
+		.delete-entry { padding: 4px; border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 11px; }
+		.delete-entry:hover { color: #a34431; }
+		.composer { position: sticky; top: 20px; padding: 21px; border: 1px solid var(--line); border-radius: 4px; background: var(--white); }
+		.composer h2 { margin: 8px 0 20px; font-size: 25px; }
+		.field-label { display: block; margin-bottom: 9px; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+		.moods { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 19px; }
+		.mood-option { position: relative; }
+		.mood-option input { position: absolute; opacity: 0; }
+		.mood-option span { display: grid; min-height: 38px; place-items: center; border: 1px solid var(--line); border-radius: 3px; color: var(--muted); cursor: pointer; font-size: 11px; transition: background 140ms ease, border-color 140ms ease, color 140ms ease; }
+		.mood-option input:checked + span { border-color: var(--green); background: #edf2e8; color: var(--green); font-weight: 700; }
+		.mood-option input:focus-visible + span { outline: 2px solid var(--coral); outline-offset: 2px; }
+		.date-input, .note-input { width: 100%; border: 1px solid var(--line); border-radius: 3px; background: #fff; color: var(--ink); }
+		.date-input { height: 40px; margin-bottom: 18px; padding: 0 10px; }
+		.note-input { min-height: 112px; margin-bottom: 14px; padding: 11px; resize: vertical; line-height: 1.5; }
+		.date-input:focus, .note-input:focus { border-color: var(--green); outline: 2px solid #dfe9d6; }
+		.save-button { width: 100%; min-height: 43px; border: 0; border-radius: 3px; background: var(--green); color: #fff; cursor: pointer; font-size: 13px; font-weight: 700; transition: background 140ms ease, transform 140ms ease; }
+		.save-button:hover { background: #294b35; }
+		.save-button:active { transform: translateY(1px); }
+		.empty-state { padding: 28px 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+		@keyframes appear { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+
+		@media (max-width: 760px) {
+			.page { width: min(100% - 32px, 560px); padding-top: 20px; }
+			.intro { grid-template-columns: 1fr; gap: 27px; padding: 34px 0; }
+			.cover { min-height: 230px; }
+			.content { grid-template-columns: 1fr; gap: 30px; }
+			.composer { position: static; grid-row: 1; }
+			.entry { grid-template-columns: 66px 1fr auto; gap: 10px; }
+			.section-heading { align-items: center; }
+		}
+		@media (prefers-reduced-motion: reduce) {
+			*, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+		}
+	</style>
+</head>
+<body>
+	<main class="page">
+		<header class="topbar">
+			<div class="brand"><span class="brand-mark" aria-hidden="true">*</span> LITTLE LIFE LOG</div>
+			<div class="date-label" id="today-label"></div>
+		</header>
+
+		<section class="intro" aria-labelledby="page-title">
+			<div>
+				<div class="eyebrow">A small record of being here</div>
+				<h1 id="page-title">Life, lately.<br><span>One day at a time.</span></h1>
+				<p class="intro-copy">The ordinary bits count, too. Keep a note of what happened, how it felt, and what you want to remember.</p>
+				<div class="count-line"><span class="count-dot" aria-hidden="true"></span><span id="entry-count">0 moments collected</span></div>
+			</div>
+			<div class="cover">
+				<img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="Sunlight falling across a quiet green forest path">
+				<div class="cover-note">take the long way home</div>
+			</div>
+		</section>
+
+		<section class="content" aria-label="Life log and new entry">
+			<div class="log-column">
+				<div class="section-heading">
+					<div class="eyebrow">The recent pages</div>
+					<h2>Little moments</h2>
+				</div>
+				<div class="entries" id="entries" aria-live="polite"></div>
+			</div>
+
+			<form class="composer" id="entry-form">
+				<div class="eyebrow">Make a note</div>
+				<h2>What was today like?</h2>
+				<fieldset style="border:0;padding:0;margin:0">
+					<legend class="field-label">Pick a feeling</legend>
+					<div class="moods">
+						<label class="mood-option"><input type="radio" name="mood" value="Good" checked><span>Good</span></label>
+						<label class="mood-option"><input type="radio" name="mood" value="Calm"><span>Calm</span></label>
+						<label class="mood-option"><input type="radio" name="mood" value="Tired"><span>Tired</span></label>
+						<label class="mood-option"><input type="radio" name="mood" value="Full"><span>Full</span></label>
+					</div>
+				</fieldset>
+				<label class="field-label" for="entry-date">Date</label>
+				<input class="date-input" id="entry-date" name="date" type="date" required>
+				<label class="field-label" for="entry-note">A moment worth keeping</label>
+				<textarea class="note-input" id="entry-note" name="note" maxlength="500" placeholder="A good conversation, a tiny win, something you noticed..." required></textarea>
+				<button class="save-button" type="submit">Save this moment</button>
+			</form>
+		</section>
+	</main>
+
+	<script>
+		const storageKey = "little-life-log.entries.v1";
+		const entriesElement = document.querySelector("#entries");
+		const form = document.querySelector("#entry-form");
+		const dateInput = document.querySelector("#entry-date");
+		const noteInput = document.querySelector("#entry-note");
+		const today = new Date();
+		const localDate = (date) => {
+			const year = date.getFullYear();
+			const month = String(date.getMonth() + 1).padStart(2, "0");
+			const day = String(date.getDate()).padStart(2, "0");
+			return `${year}-${month}-${day}`;
+		};
+
+		document.querySelector("#today-label").textContent = new Intl.DateTimeFormat("en", {
+			weekday: "long", month: "long", day: "numeric"
+		}).format(today);
+		dateInput.value = localDate(today);
+
+		const starterEntries = [
+			{ id: "sample-1", date: localDate(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1)), mood: "Calm", note: "Made tea after work and called Mum. We talked about absolutely nothing, which was exactly what I needed." },
+			{ id: "sample-2", date: localDate(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 2)), mood: "Good", note: "Found a little bookshop on the walk home. Bought a poetry collection and took the scenic route." },
+			{ id: "sample-3", date: localDate(new Date(today.getFullYear(), today.getMonth(), today.getDate() - 3)), mood: "Tired", note: "A long day, but dinner with Sam made it feel smaller. Remember to make plans just because." }
+		];
+
+		let entries;
+		try {
+			const savedEntries = JSON.parse(localStorage.getItem(storageKey));
+			entries = Array.isArray(savedEntries) ? savedEntries : starterEntries;
+		} catch {
+			entries = starterEntries;
+		}
+
+		function formatDate(dateString) {
+			const [year, month, day] = dateString.split("-").map(Number);
+			return new Intl.DateTimeFormat("en", { month: "short", day: "numeric" }).format(new Date(year, month - 1, day));
+		}
+
+		function saveEntries() {
+			try {
+				localStorage.setItem(storageKey, JSON.stringify(entries));
+			} catch {
+				// The current page still works if browser storage is unavailable.
+			}
+		}
+
+		function renderEntries() {
+			entriesElement.replaceChildren();
+			document.querySelector("#entry-count").textContent = `${entries.length} ${entries.length === 1 ? "moment" : "moments"} collected`;
+
+			if (entries.length === 0) {
+				const emptyState = document.createElement("p");
+				emptyState.className = "empty-state";
+				emptyState.textContent = "No moments written down yet. Start with one small thing from today.";
+				entriesElement.append(emptyState);
+				return;
+			}
+
+			[...entries].sort((a, b) => b.date.localeCompare(a.date)).forEach((entry) => {
+				const row = document.createElement("article");
+				row.className = "entry";
+				const date = document.createElement("time");
+				date.className = "entry-date";
+				date.dateTime = entry.date;
+				date.textContent = formatDate(entry.date);
+				const copy = document.createElement("div");
+				const mood = document.createElement("div");
+				mood.className = "entry-mood";
+				mood.textContent = entry.mood;
+				const note = document.createElement("p");
+				note.textContent = entry.note;
+				copy.append(mood, note);
+				const remove = document.createElement("button");
+				remove.className = "delete-entry";
+				remove.type = "button";
+				remove.textContent = "Remove";
+				remove.setAttribute("aria-label", `Remove moment from ${formatDate(entry.date)}`);
+				remove.addEventListener("click", () => {
+					entries = entries.filter((item) => item.id !== entry.id);
+					saveEntries();
+					renderEntries();
+				});
+				row.append(date, copy, remove);
+				entriesElement.append(row);
+			});
+		}
+
+		form.addEventListener("submit", (event) => {
+			event.preventDefault();
+			const note = noteInput.value.trim();
+			if (!note) return;
+			entries.push({
+				id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`,
+				date: dateInput.value,
+				mood: form.elements.mood.value,
+				note
+			});
+			try {
+				localStorage.setItem(storageKey, JSON.stringify(entries));
+			} catch {
+				// Keep the new entry visible for this session if storage is unavailable.
+			}
+			renderEntries();
+			noteInput.value = "";
+			dateInput.value = localDate(today);
+			form.querySelector("button[type='submit']").focus();
+		});
+
+		renderEntries();
+	</script>
+</body>
+</html>
